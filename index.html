@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Projects – Daniel</title>
+  <style>
+    :root{color-scheme:light;font-family:Inter,Geist,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#171717}
+    *{box-sizing:border-box}html{background:#fff}body{margin:0;min-height:100vh;background:#fff}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+    .wrap{max-width:1200px;margin:auto;padding:0 32px 80px}.top{height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eaeaea}.brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:14px;letter-spacing:-.02em}.logo{width:25px;height:25px;display:grid;place-items:center;background:#000;color:#fff;border-radius:5px;font-weight:800;font-size:15px;letter-spacing:-.05em}.top small{color:#666;font-size:13px;font-weight:400;margin-left:5px}.pill{border:1px solid #e5e5e5;border-radius:6px;padding:7px 10px;font-size:12px;color:#a1a1a1}
+    .hero{padding:54px 0 38px;border-bottom:1px solid #eaeaea}.eyebrow{display:flex;align-items:center;gap:8px;color:#666;font-size:12px;font-weight:600;letter-spacing:.01em;text-transform:none}.dot{width:6px;height:6px;background:#000;border-radius:50%}.hero h1{font-size:clamp(32px,4vw,42px);line-height:1.06;letter-spacing:-.065em;margin:0 0 10px;font-weight:700}.hero p{max-width:620px;color:#666;line-height:1.7;margin:0;font-size:14px}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:36px 0 20px}.label{font-size:18px;font-weight:600;letter-spacing:-.025em}.count{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;padding:0 6px;margin-left:7px;border:1px solid #e5e5e5;border-radius:6px;color:#666;font-size:12px;font-weight:500}.actions{display:flex;gap:9px}.search{display:flex;align-items:center;gap:9px;border:1px solid #e5e5e5;border-radius:7px;background:#fff;padding:0 11px;height:36px;min-width:230px;color:#666}.search:focus-within{border-color:#999}.search input{border:0;outline:0;background:transparent;color:#171717;width:100%;font-size:13px}.search input::placeholder{color:#888}.btn{border:1px solid #e5e5e5;background:#fff;color:#171717;border-radius:7px;padding:8px 12px;font-size:13px;font-weight:550;white-space:nowrap;min-height:36px}.btn:hover,.btn:focus-visible{background:#fafafa;border-color:#aaa}.btn.primary{background:#000;color:#fff;border-color:#000}.btn.primary:hover{background:#333}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{position:relative;min-width:0;border:1px solid #eaeaea;border-radius:10px;background:#fff;transition:border-color .16s,background .16s}.card:hover{border-color:#aaa;background:#fafafa}.card:focus-within{border-color:#999}.card-link{min-height:204px;padding:20px 58px 20px 20px;display:flex;flex-direction:column;color:inherit;text-decoration:none}.card-link:focus-visible{outline:2px solid #000;outline-offset:3px;border-radius:10px}.card-head{display:flex;align-items:flex-start;justify-content:space-between}.icon{width:36px;height:36px;border-radius:7px;display:grid;place-items:center;background:#fafafa;color:#171717;border:1px solid #eaeaea;font-size:15px;font-weight:650}.arrow{font-size:18px;color:#888;line-height:1}.card:hover .arrow{color:#000}.card h2{font-size:17px;letter-spacing:-.025em;margin:auto 0 8px;font-weight:600}.card p{color:#666;font-size:13px;line-height:1.5;margin:0 0 13px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.domain{font-size:12px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.star{position:absolute;top:12px;right:12px;width:32px;height:32px;display:grid;place-items:center;border:1px solid #e5e5e5;border-radius:7px;background:#fff;color:#666;font-size:19px;line-height:1}.star:hover,.star:focus-visible{border-color:#999;color:#111;outline:none}.star[aria-pressed="true"]{color:#111;border-color:#ccc;background:#fafafa}.notice{grid-column:1/-1;border:1px solid #f5d48a;background:#fffbeb;color:#7b510a;border-radius:8px;padding:13px;font-size:13px}.empty{grid-column:1/-1;border:1px dashed #ddd;background:#fafafa;border-radius:10px;text-align:center;padding:65px 20px;color:#666}.empty strong{display:block;color:#171717;font-size:17px;margin-bottom:8px}.empty p{margin:0 auto;max-width:440px;line-height:1.6;font-size:13px}.footer{border-top:1px solid #eaeaea;margin-top:68px;padding-top:22px;color:#666;font-size:12px;display:flex;justify-content:space-between;gap:15px}
+    dialog{width:min(430px,calc(100vw - 28px));border:1px solid #e5e5e5;background:#fff;color:#171717;border-radius:10px;padding:26px;box-shadow:0 28px 90px #0003}dialog::backdrop{background:#0005;backdrop-filter:blur(5px)}dialog h2{margin:0 0 7px;letter-spacing:-.035em}dialog p{color:#666;font-size:13px;line-height:1.5;margin:0 0 24px}label{display:block;color:#555;font-size:12px;font-weight:550;margin:16px 0 8px}dialog input{width:100%;background:#fff;border:1px solid #ddd;border-radius:6px;color:#171717;padding:11px;outline:none;font-size:14px}dialog input:focus{border-color:#666}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:24px}.note{font-size:12px;color:#a86b00;line-height:1.5;margin-top:10px}
+    @media(max-width:1000px){.hero{padding:50px 0 34px}}@media(max-width:650px){.wrap{padding:0 16px 48px}.top{height:60px}.top small{display:none}.hero{padding:42px 0 30px}.hero h1{font-size:36px}.toolbar{align-items:stretch;flex-direction:column;margin-top:28px}.actions{width:100%}.search{flex:1;min-width:0}.grid{gap:10px}.card-link{min-height:190px;padding:15px 42px 16px 14px}.icon{width:30px;height:30px;font-size:13px}.star{top:9px;right:9px;width:29px;height:29px}.card h2{font-size:14px;line-height:1.25;overflow-wrap:anywhere}.card p{font-size:11px;line-height:1.45;min-height:32px;margin-bottom:10px}.domain{font-size:10px}.footer{flex-direction:column;margin-top:48px}}@media(max-width:350px){.grid{gap:8px}.card-link{padding-right:38px;padding-left:11px}.card h2{font-size:13px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><div class="brand"><span class="logo">D</span><span>daniel <small> / Projects</small></span></div><span class="pill">Hobby</span></header>
+  <main><section class="hero"><h1>Projects</h1><p>Your Vercel projects in one place. New projects appear automatically.</p></section>
+  <section aria-label="Projects"><div class="toolbar"><div class="label">All Projects <span class="count" id="count"></span></div><div class="actions"><label class="search" aria-label="Search projects">⌕ <input id="search" type="search" placeholder="Search projects…" /></label><button class="btn primary" id="refresh">↻ Refresh</button></div></div><div class="grid" id="grid"></div></section></main>
+  
+</div>
+<dialog id="login"><form id="loginForm"><h2>Sign in</h2><p>This project dashboard is private. Enter your portal password.</p><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required /><div class="note" id="loginError" role="alert"></div><div class="dialog-actions"><button type="submit" class="btn primary">Continue</button></div></form></dialog>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let sites = [
+    {id:'nuernberg-radtour',name:'Nürnberg Fahrradtour',description:'Interaktive Fahrradroute und Etappen durch Nürnberg.',url:'https://nuernberg-radtour.vercel.app',host:'nuernberg-radtour.vercel.app',scope:'Personal'},
+    {id:'daily-dashboard',name:'Daily Dashboard',description:'Persönliches Dashboard für Alltag und Übersicht.',url:'https://daily-dashboard-gray.vercel.app',host:'daily-dashboard-gray.vercel.app',scope:'Personal'},
+    {id:'7-habits',name:'7 Habits',description:'Habit-Tracker für tägliche Routinen.',url:'https://7-habits-eight.vercel.app',host:'7-habits-eight.vercel.app',scope:'Personal'},
+    {id:'spotify-nfc',name:'Spotify NFC',description:'Spotify-Seite für NFC-Tags.',url:'https://spotify-nfc-wheat.vercel.app',host:'spotify-nfc-wheat.vercel.app',scope:'Personal'}
+  ], warning = '';
+  const STAR_KEY='vercel-portal-starred-v1';
+  let starred=new Set();
+  try{const saved=JSON.parse(localStorage.getItem(STAR_KEY)||'[]');if(Array.isArray(saved))starred=new Set(saved.filter(x=>typeof x==='string'))}catch{}
+  function node(tag, cls, value) { const el=document.createElement(tag); if(cls)el.className=cls; if(value!=null)el.textContent=value; return el; }
+  function render() {
+    const q=$('search').value.trim().toLocaleLowerCase('de');
+    const shown=sites.map((site,index)=>({site,index})).sort((a,b)=>Number(starred.has(b.site.id))-Number(starred.has(a.site.id))||a.index-b.index).map(x=>x.site).filter(s=>`${s.name} ${s.description} ${s.host||''}`.toLocaleLowerCase('de').includes(q));
+    $('count').textContent=String(sites.length);$('grid').replaceChildren();
+    if(warning)$('grid').append(node('div','notice',warning));
+    if(!shown.length){const box=node('div','empty');box.append(node('strong','',q?'No results':'No production deployments'),node('p','',q?'Try a different search.':'New Vercel projects appear here automatically when they have a production domain.'));$('grid').append(box);return}
+    for(const site of shown){
+      const card=node('article','card');
+      const link=node(site.url?'a':'div','card-link');
+      if(site.url){link.href=site.url;link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label',`${site.name} öffnen`)}
+      const head=node('div','card-head');head.append(node('div','icon',site.name.trim().charAt(0).toUpperCase()||'↗'),node('span','arrow',site.url?'↗':'–'));
+      link.append(head,node('h2','',site.name),node('p','',site.description),node('span','domain',site.host||'No production domain · '+site.scope));
+      const pin=node('button','star',starred.has(site.id)?'★':'☆');pin.type='button';pin.setAttribute('aria-pressed',String(starred.has(site.id)));pin.setAttribute('aria-label',starred.has(site.id)?`${site.name} aus Favoriten entfernen`:`${site.name} als Favorit markieren`);pin.title=pin.getAttribute('aria-label');
+      pin.addEventListener('click',()=>{if(starred.has(site.id))starred.delete(site.id);else starred.add(site.id);try{localStorage.setItem(STAR_KEY,JSON.stringify([...starred]))}catch{}render()});
+      card.append(link,pin);$('grid').append(card);
+    }
+  }
+  async function load(){
+    $('refresh').disabled=true;warning='';
+    try{const response=await fetch('/api/sites',{credentials:'same-origin',cache:'no-store'});const data=await response.json();
+      if(response.status===401){$('login').showModal();return}
+      if(!response.ok)throw Error(data.error||'Projects could not be loaded.');
+      sites=Array.isArray(data.sites)?data.sites:[];warning=(data.warnings||[]).join(' ');render();
+    }catch(e){warning=e.message;render()}finally{$('refresh').disabled=false}
+  }
+  $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';
+    try{const response=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('password').value})});const data=await response.json();
+      if(!response.ok)throw Error(data.error||'Sign in failed.');$('password').value='';$('login').close();await load();
+    }catch(error){$('loginError').textContent=error.message}
+  });
+  $('search').addEventListener('input',render);$('refresh').addEventListener('click',load);
+  $('grid').append(node('div','empty','Loading projects…'));load();
+})();
+</script>
+</body>
+</html>
