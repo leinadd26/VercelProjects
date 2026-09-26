@@ -27,12 +27,7 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  let sites = [
-    {id:'nuernberg-radtour',name:'Nürnberg Fahrradtour',description:'Interaktive Fahrradroute und Etappen durch Nürnberg.',url:'https://nuernberg-radtour.vercel.app',host:'nuernberg-radtour.vercel.app',scope:'Personal'},
-    {id:'daily-dashboard',name:'Daily Dashboard',description:'Persönliches Dashboard für Alltag und Übersicht.',url:'https://daily-dashboard-gray.vercel.app',host:'daily-dashboard-gray.vercel.app',scope:'Personal'},
-    {id:'7-habits',name:'7 Habits',description:'Habit-Tracker für tägliche Routinen.',url:'https://7-habits-eight.vercel.app',host:'7-habits-eight.vercel.app',scope:'Personal'},
-    {id:'spotify-nfc',name:'Spotify NFC',description:'Spotify-Seite für NFC-Tags.',url:'https://spotify-nfc-wheat.vercel.app',host:'spotify-nfc-wheat.vercel.app',scope:'Personal'}
-  ], warning = '';
+  let sites = [], warning = '';
   const STAR_KEY='vercel-portal-starred-v1';
   let starred=new Set();
   try{const saved=JSON.parse(localStorage.getItem(STAR_KEY)||'[]');if(Array.isArray(saved))starred=new Set(saved.filter(x=>typeof x==='string'))}catch{}
