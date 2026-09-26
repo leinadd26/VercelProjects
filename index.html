@@ -18,7 +18,7 @@
 <body>
 <div class="wrap">
   <header class="top"><div class="brand"><span class="logo">D</span><span>daniel <small> / Projects</small></span></div><span class="pill">Hobby</span></header>
-  <main><section class="hero"><h1>Projects</h1><p>Your Vercel projects in one place. New projects appear automatically.</p></section>
+  <main><section class="hero"><h1>Projects</h1><p>Your Vercel, Firebase Hosting and GitHub Pages sites in one place. New sites appear automatically.</p></section>
   <section aria-label="Projects"><div class="toolbar"><div class="label">All Projects <span class="count" id="count"></span></div><div class="actions"><label class="search" aria-label="Search projects">⌕ <input id="search" type="search" placeholder="Search projects…" /></label><button class="btn primary" id="refresh">↻ Refresh</button></div></div><div class="grid" id="grid"></div></section></main>
   
 </div>
@@ -34,10 +34,10 @@
   function node(tag, cls, value) { const el=document.createElement(tag); if(cls)el.className=cls; if(value!=null)el.textContent=value; return el; }
   function render() {
     const q=$('search').value.trim().toLocaleLowerCase('de');
-    const shown=sites.map((site,index)=>({site,index})).sort((a,b)=>Number(starred.has(b.site.id))-Number(starred.has(a.site.id))||a.index-b.index).map(x=>x.site).filter(s=>`${s.name} ${s.description} ${s.host||''}`.toLocaleLowerCase('de').includes(q));
+    const shown=sites.map((site,index)=>({site,index})).sort((a,b)=>Number(starred.has(b.site.id))-Number(starred.has(a.site.id))||a.index-b.index).map(x=>x.site).filter(s=>`${s.name} ${s.description} ${s.source||''} ${s.scope||''} ${s.host||''}`.toLocaleLowerCase('de').includes(q));
     $('count').textContent=String(sites.length);$('grid').replaceChildren();
     if(warning)$('grid').append(node('div','notice',warning));
-    if(!shown.length){const box=node('div','empty');box.append(node('strong','',q?'No results':'No production deployments'),node('p','',q?'Try a different search.':'New Vercel projects appear here automatically when they have a production domain.'));$('grid').append(box);return}
+    if(!shown.length){const box=node('div','empty');box.append(node('strong','',q?'No results':'No websites found'),node('p','',q?'Try a different search.':'New sites appear here automatically when they have a production URL.'));$('grid').append(box);return}
     for(const site of shown){
       const card=node('article','card');
       const link=node(site.url?'a':'div','card-link');
