@@ -16,7 +16,7 @@ export default { id: 'calendar', n: 'Kalender', ic: 'cal', w: 980, h: 680, creat
     return o;
   };
   bind(root, { prev() { off--; }, next() { off++; }, today() { off = 0; selD = S.day; }, sel(d) { selD = +d.d; },
-    call(d) { const r = startCall(d.id); emit(); if (r.noshow) return; openApp('call'); }, mail(d) { openApp('mail', { to: d.to }); },
+    call(d) { const r = startCall(d.id); emit(); if (r.nohours) return toast(`Dafür fehlen dir heute Stunden (benötigt ${r.need.toFixed(1).replace('.', ',')} h). Plane Projektarbeit nach dem Termin.`, 'warn'); if (r.noshow) return; openApp('call'); }, mail(d) { openApp('mail', { to: d.to }); },
     addrem() { const t = root.querySelector('#rt').value.trim(), dd = root.querySelector('#rd').value; if (!t || !dd) return toast('Text und Datum angeben.', 'warn'); S.rem.push({ id: uid('r'), d: Math.round((Date.parse(dd) - Date.UTC(2026, 10, 2)) / 864e5), t }); emit(); } });
   function render() {
     const base = dateOf(S.day), y = base.getUTCFullYear(), mo = base.getUTCMonth() + off, first = new Date(Date.UTC(y, mo, 1)), dayN = new Date(Date.UTC(y, mo + 1, 0)).getUTCDate(), d0 = Math.round((first - Date.UTC(2026, 10, 2)) / 864e5), lead = (first.getUTCDay() + 6) % 7;

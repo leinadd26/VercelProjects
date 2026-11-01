@@ -32,7 +32,7 @@ export function evalOutreach(co, ct, subj, body, prev) {
   if (P) { if (ct.p === 'busy' && len > 900) add(-6, 'Für vielbeschäftigte Menschen zu lang.'); if (ct.p === 'curious' && own >= 1) add(4, ''); if (ct.p === 'tech' && /(api|webhook|oauth|schnittstelle)/.test(L)) add(4, 'Technischer Bezug passt zur Zielperson.'); }
   sc += (co.att - 3) * 3 + S.rep / 10 + (S.skills.Kommunikation - 15) / 8;
   const p = clamp((sc - 25) / 65, .03, .9) * (ct ? 1 : .75) + (P ? P.mail : 0) + (c.trust - 40) / 400;
-  return { sc: Math.round(sc), pts, p: clamp(p, .02, .92), own };
+  return { sc: Math.round(sc), pts, p: clamp(sc < 30 ? p * .25 : p, .004, .92), own };
 }
 const who = (ct, co) => ct ? `${ct.f ? 'Frau' : 'Herr'} ${ct.name.split(' ').pop()}` : 'Damen und Herren';
 const sg = (ct) => ct ? `${PERS[ct.p].pre[Math.floor(rnd() * PERS[ct.p].pre.length)]}` : '';
@@ -80,6 +80,7 @@ function apiText(co, w, full) {
 // ---------- Discovery-Gespräch ----------
 export function startCall(mid) {
   const m = S.meetings.find(x => x.id === mid), co = getCo(m.co), ct = co.cn[m.ct], P = PERS[ct.p], c = cs(co.id);
+  if (S.hours < m.dur / 60 - .01) return { nohours: true, need: m.dur / 60 };
   if (chance(P.ghost * (c.trust < 45 ? 1.6 : .8)) && !m.rs) { m.rs = 1; m.d = nextWorkday(S.day + 3); m.h = 11; notify(`${ct.name} ist kurzfristig verhindert – Termin verschoben auf ${fmtDate(m.d)}.`, 'calendar', 'warn'); hist(co.id, 'Gesprächspartner:in abgetaucht/verhindert'); return { noshow: true }; }
   S.call = { mid, co: co.id, ct: m.ct, left: m.dur, tot: m.dur, asked: [], tx: [{ w: 'c', t: `${P.pre[0]} Guten Tag, schön, dass es klappt. Wir haben etwa ${m.dur} Minuten.` }], pitched: 0, sum: 0, first: null, clar: {}, ended: 0, prem: 0 };
   c.calls++; c.lastContact = S.day; setStage(co.id, 'discovery'); makeLead(co.id); useHours(m.dur / 60); return { ok: true };
@@ -176,6 +177,9 @@ export function evalProposal(co, p) {
     if (!w.viable) return { res: 'honest', good: ['Du hast ehrlich empfohlen, nichts zu bauen – weil sich der Fall nicht rechnet.'] };
     return { res: 'reject', ob: ['Sie empfehlen keine Lösung, obwohl hier ein wirtschaftlicher Hebel vorhanden gewesen wäre.'], reason: 'wrong' };
   }
+  const prev = S.projects.filter(x => x.co === co.id && !x.churn);
+  if (prev.some(x => !['live', 'done', 'cancelled'].includes(x.status))) return { res: 'reject', ob: ['Wir haben bereits ein laufendes Projekt mit Ihnen – bitte erst dieses abschließen.'], reason: 'busy' };
+  if (prev.some(x => ['live', 'done'].includes(x.status) && !x.pilot && !x.gig && x.arch === p.target)) return { res: 'reject', ob: ['Diesen Prozess haben Sie bereits für uns automatisiert.'], reason: 'done' };
   const known = KEYQ.filter(q => c.known[q] && !c.known[q].vague).length, und = clamp(known / KEYQ.length * 1.15, 0, 1), cv = coverage(co, p.comps);
   if (p.target !== co.a) { ob.push('Ihr Angebot adressiert nicht das Problem, das uns tatsächlich Zeit kostet.'); }
   let fit = p.target === co.a ? cv.cov : cv.cov * .25; fit = clamp(fit - cv.waste.length * .07, 0, 1); cv.note.forEach(n => ob.push(n));
@@ -201,7 +205,7 @@ export function evalProposal(co, p) {
   return { res: 'reject', ob: [...ob, 'Der Preis steht nicht im Verhältnis zum erwartbaren Nutzen.'], reason: 'price', und, fit, pr };
 }
 export function sendProposal(co, p, mailOpts) {
-  const ct = dm(co), c = cs(co.id); p.id = uid('pr'); c.props++; c.deal = p.price; setStage(co.id, 'angebot'); hist(co.id, `Angebot gesendet: ${eur(p.price)}${p.pilot ? ' (Pilot)' : ''}`);
+  useHours(1.5); const ct = dm(co), c = cs(co.id); p.id = uid('pr'); c.props++; c.deal = p.price; setStage(co.id, 'angebot'); hist(co.id, `Angebot gesendet: ${eur(p.price)}${p.pilot ? ' (Pilot)' : ''}`);
   const m = sendMail({ co: co.id, ct: ct.i, to: addrOf(co, ct), subj: mailOpts.subj, body: mailOpts.body, att: ['Angebot.pdf'], kind: 'proposal' }); m.prop = p;
   const r = evalProposal(co, p); const delay = Math.round((2 + PERS[ct.p].delay + Math.floor(rnd() * 3)) * CAMP[co.camp].slow); const base = { fn: ct.name, from: addrOf(co, ct), to: 'ich', co: co.id, ct: ct.i, th: m.th, subj: 'Re: ' + mailOpts.subj, prop: p };
   gain('Vertrieb', 1.2); gain('ROI-Berechnung', p.roi ? 1 : .2); gain('Finanzplanung', .4);

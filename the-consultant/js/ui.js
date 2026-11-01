@@ -15,6 +15,10 @@ export function bind(root, map) {
   root.addEventListener('change', e => { const t = e.target.closest('[data-c]'); if (t && map[t.dataset.c]) { withState(root, () => map[t.dataset.c](t.type === 'checkbox' ? t.checked : t.value, t, e)); root.dispatchEvent(new Event('ui:changed')); } });
 }
 function withState(root, fn) {
+  if (root.__busy) { fn(); return; }
+  root.__busy = 1; try { withState2(root, fn); } finally { root.__busy = 0; }
+}
+function withState2(root, fn) {
   const sc = {}; root.querySelectorAll('[data-sc]').forEach(e => { sc[e.dataset.sc] = e.scrollTop; });
   const ae = document.activeElement, k = ae && root.contains(ae) ? ae.dataset.k : null, ss = k ? [ae.selectionStart, ae.selectionEnd] : null, top = root.scrollTop;
   fn();
@@ -28,7 +32,7 @@ export function openApp(id, arg) {
     el.className = 'win'; el.dataset.app = id; el.style.cssText = `left:${Math.max(6, Math.min(40 + (cascade % 6) * 28, vw - ww - 6))}px;top:${Math.max(6, Math.min(24 + (cascade % 6) * 24, vh - hh - 6))}px;width:${ww}px;height:${hh}px`; cascade++;
     el.innerHTML = `<div class="wh"><span class="t">${ic(A.ic, 15)} ${esc(A.n)}</span><span class="sp"></span><button class="wc mx" title="Maximieren" data-w="max">${ic('max', 13)}</button><button class="wc" title="Minimieren" data-w="min">${ic('min', 14)}</button><button class="wc x" title="Schließen" data-w="x">${ic('x', 14)}</button></div><div class="wb ${A.nopad ? 'nopad' : ''}"></div>`;
     desk.appendChild(el); const root = el.querySelector('.wb'), api = A.create(root, { close: () => closeApp(id) }) || {}; const raw = api.render || (() => { }); api.render = () => withState(root, raw);
-    w = { el, root, api, id }; wins.set(id, w); root.addEventListener('ui:changed', () => { try { api.render(); } catch (e) { console.error(id, e); } });
+    w = { el, root, api, id }; wins.set(id, w); root.addEventListener('ui:changed', () => { const run = () => { try { api.render(); } catch (e) { console.error(id, e); } }; if (root.__busy) requestAnimationFrame(run); else run(); });
     el.addEventListener('pointerdown', () => focus(id), true);
     el.querySelector('.wh').addEventListener('dblclick', e => { if (!e.target.closest('.wc')) el.classList.toggle('max'); });
     el.querySelectorAll('.wc').forEach(b => b.addEventListener('click', () => { const a = b.dataset.w; if (a === 'x') closeApp(id); else if (a === 'min') { el.classList.add('hide'); refreshDock(); } else el.classList.toggle('max'); }));

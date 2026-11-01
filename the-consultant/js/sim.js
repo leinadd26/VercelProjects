@@ -100,8 +100,9 @@ export function endDay() {
   S.meetings.filter(m => m.d === S.day && !m.done).forEach(missMeeting);
   if (S.call) S.call = null;
   let guard = 0; do { S.day++; process(); } while (isWeekend(S.day) && guard++ < 4);
-  S.hours = 8; hist2(); emit();
+  S.cap = Math.max(3, 8 - support()); S.hours = S.cap; hist2(); emit();
 }
+export const support = () => Math.round(S.projects.filter(p => p.status === 'live' && p.mt > 0 && !p.churn).length * .12 * 10) / 10;
 const hist2 = () => { const l = S.cashH[S.cashH.length - 1]; if (l[0] !== S.day) S.cashH.push([S.day, S.cash]); };
 function process() {
   const due = S.q.filter(x => x.d <= S.day); S.q = S.q.filter(x => x.d > S.day);
@@ -117,7 +118,7 @@ function process() {
 }
 const FN = { sec_info(x) { cs(x.co).known.api = { v: x.api, vague: 0, src: 'IT-Dienstleister', lic: x.lic, d: S.day, txt: x.txt }; } };
 function monthly() {
-  ledger('exp', 'Software', 39, 'Software-Abos (IDE, Domain, Postfach, Notizen)'); ledger('exp', 'Versicherung', 29, 'Berufshaftpflicht');
+  ledger('exp', 'Software', 39, 'Software-Abos (IDE, Domain, Postfach, Notizen)'); ledger('exp', 'Versicherung', 29, 'Berufshaftpflicht'); ledger('exp', 'Büro', 80, 'Co-Working-Platz'); ledger('exp', 'Buchhaltung', 45, 'Steuerberater / Buchhaltung');
   for (const p of S.projects) if (['build', 'demo', 'live'].includes(p.status) && !p.churn) {
     const c = sum(p.comps, k => COMP[k].c) + p.extraCost; if (c > 0) ledger('exp', 'Hosting & APIs', Math.round(c), `Betrieb ${getCo(p.co).n}`, p.co);
     if (p.status === 'live' && p.mt > 0) { const b = { id: uid('b'), label: `Wartung ${fmtDate(S.day, { month: 'long', year: 'numeric' })}`, amt: p.mt, ready: 1, sent: 0, rec: 1 }; p.bill.push(b); issueInvoice(p.id, b.id); }
@@ -132,7 +133,7 @@ const NEWS = {
   prof: ['E-Rechnungspflicht erhöht Druck auf Kanzleien.', 'Fachkräftemangel in Steuerkanzleien.'], mob: ['Wintersaison startet früh – Anfragen steigen.', 'Autohäuser kämpfen um Online-Leads.'], trade: ['Preisdruck im Großhandel nimmt zu.', 'EDI wird bei Großkunden Pflicht.'] };
 const EV = [
   { w: 3, ok: () => S.gen.length < 14, run() { const c = genCompany(); if (c) notify(`Neu im Verzeichnis: ${c.n} (${c.city})`, 'directory'); } },
-  { w: 3, ok: () => true, run() { inbound(); } },
+  { w: 2, ok: () => true, run() { inbound(); } },
   { w: 2, ok: () => leads().length > 0, run() { const co = pick(leads()), c = cs(co.id), m = c.mod; const nw = pick(['rest', 'csv', 'none'].filter(x => x !== wf(co).api)); m.api = nw; m.lic = 0; if (c.known.api) c.known.api.stale = 1; notify(`${co.n} hat sein Hauptsystem gewechselt (Schnittstellenlage kann sich geändert haben).`, 'crm', 'warn'); hist(co.id, 'Software gewechselt'); } },
   { w: 1.5, ok: () => leads().length > 0, run() { const co = pick(leads()); addTrust(co.id, -8); cs(co.id).mod.dm = 1; notify(`${co.n}: Neue Entscheiderin im Haus – Beziehung muss neu aufgebaut werden.`, 'crm', 'warn'); hist(co.id, 'Neuer Entscheider'); } },
   { w: 2, ok: () => leads().length > 0, run() { const co = pick(leads()), up = chance(.5), m = cs(co.id).mod; m.bud = (m.bud || 1) * (up ? 1.25 : .7); notify(`${co.n}: Budgetlage ${up ? 'hat sich verbessert' : 'hat sich verschlechtert'}.`, 'crm', up ? 'good' : 'warn'); hist(co.id, up ? 'Budget erhöht' : 'Budget gekürzt'); } },
@@ -145,7 +146,7 @@ const EV = [
 const leads = st => allCo().filter(c => { const k = S.co[c.id]; return k && k.lead && !['gewonnen', 'verloren', 'ruhend'].includes(k.stage) && (!st || st.includes(k.stage)); });
 function rollEvent() {
   const lowCash = S.cash < 700 && !S.projects.some(p => ['kickoff', 'build', 'demo'].includes(p.status)) && !S.inv.some(i => !i.paid);
-  if (lowCash && chance(.35)) return inbound(true);
+  if (lowCash && chance(.12)) return inbound(true);
   if (!chance(.38)) return;
   const el = EV.filter(e => e.ok()), tot = sum(el, e => e.w); let r = rnd() * tot;
   for (const e of el) { if ((r -= e.w) <= 0) return e.run(); }

@@ -26,7 +26,7 @@ export function init(o) {
   for (const g of Object.values(SKILLS)) for (const k of g) skills[k] = 8 + (k === 'Python' || k === 'JavaScript / Node.js' || k === 'REST APIs' ? 8 : 0);
   Object.assign(skills, BG[o.bg].s);
   S = {
-    v: 1, day: 0, hours: 8, seed: (o.seed ?? Date.now()) % 1e9, uid: 1, over: false, started: false,
+    v: 1, day: 0, hours: 8, cap: 8, seed: (o.seed ?? Date.now()) % 1e9, uid: 1, over: false, started: false,
     me: { name: o.name, age: o.age, title: 'Freiberuflicher KI- & Automatisierungsberater', exp: 'Einsteiger', bg: o.bg, rate: 65, logo: '#4c8dff',
       co: { name: o.company, desc: 'Wir vereinfachen wiederkehrende Abläufe im Mittelstand durch maßgeschneiderte Software, KI-Integrationen und Workflow-Automatisierung – erst verstehen, dann bauen.', spec: 'Alle Branchen', svc: [
         { n: 'Prozess-Check (Analyse + Empfehlung)', p: 480 }, { n: 'Pilot-Automatisierung (Festpreis)', p: 2400 }, { n: 'Individuelle Integration', p: 6500 }, { n: 'Wartung & Betrieb (monatlich)', p: 290 }] } },
