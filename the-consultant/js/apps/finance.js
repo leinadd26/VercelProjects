@@ -1,0 +1,28 @@
+import { S, emit } from '../store.js';
+import { getCo } from '../companies.js';
+import { stats, issueInvoice, remind } from '../sim.js';
+import { esc, ic, eur, fmtDate, fmtShort, sum } from '../util.js';
+import { bind, toast } from '../ui.js';
+import { cashChart } from '../viz.js';
+
+export default { id: 'finance', n: 'Finanzen', ic: 'euro', w: 1020, h: 680, nopad: true, create(root) {
+  let tab = 'ov';
+  bind(root, { tab(d) { tab = d.t; }, bill(d) { const inv = issueInvoice(d.p, d.b); if (inv) { toast(`Rechnung ${inv.no} gestellt.`, 'good'); emit(); } }, rem(d) { if (remind(d.id)) { toast('Zahlungserinnerung gesendet (kostet etwas Vertrauen).'); emit(); } else toast('Noch nicht überfällig.', 'warn'); },
+    go(d) { } });
+  function render() {
+    const st = stats(), inv = S.inv.slice().reverse(), todo = S.projects.flatMap(p => p.bill.filter(b => b.ready && !b.sent).map(b => ({ p, b })));
+    const k = (l, v, s, c = '') => `<div class="kpi"><div class="l">${l}</div><div class="v ${c}">${v}</div><div class="s">${s || '&nbsp;'}</div></div>`;
+    const cats = {}; S.led.filter(l => l.t === 'exp').forEach(l => cats[l.cat] = (cats[l.cat] || 0) + l.a);
+    const perCo = {}; S.led.forEach(l => { if (l.co) { perCo[l.co] ||= { r: 0, e: 0 }; perCo[l.co][l.t === 'rev' ? 'r' : 'e'] += l.a; } });
+    const exp = S.inv.filter(i => !i.paid && i.due >= S.day && i.due <= S.day + 60);
+    root.innerHTML = `<div class="tabs">${[['ov', 'Übersicht'], ['inv', 'Rechnungen'], ['led', 'Buchungen'], ['cus', 'Je Kunde']].map(([a, n]) => `<button class="${tab === a ? 'on' : ''}" data-a="tab" data-t="${a}">${n}</button>`).join('')}</div><div class="pad" data-sc="f" style="height:calc(100% - 38px);overflow:auto">
+    ${tab === 'ov' ? `<div class="g4 mb">${k('Kontostand', eur(S.cash), `Startkapital ${eur(S.start)}`, S.cash < 0 ? 'bad' : '')}${k('Umsatz gesamt', eur(st.allRev), 'netto')}${k('Ausgaben gesamt', eur(st.allExp))}${k('Gewinn gesamt', eur(st.allRev - st.allExp), '', st.allRev - st.allExp >= 0 ? 'ok' : 'bad')}${k('Umsatz 30 T.', eur(st.rev))}${k('Ausgaben 30 T.', eur(st.exp))}${k('Wiederkehrend', eur(st.rec) + '/Mo')}${k('Offene Forderungen', eur(st.out), `${S.inv.filter(i => !i.paid).length} Rechnungen`)}</div>
+    <div class="g2"><div class="card"><h3>Cashflow (Kontoverlauf)</h3>${cashChart(140)}</div><div class="card"><h3>Ausgaben nach Kategorie</h3>${Object.entries(cats).map(([c, v]) => `<div class="row sm" style="padding:3px 0"><span class="sp">${esc(c)}</span><b>${eur(v)}</b></div>`).join('') || '<p class="mut sm">Noch keine Ausgaben.</p>'}<p class="xs mut3 mt">Monatliche Fixkosten: Software 39 €, Haftpflicht 29 € + Hosting/API je Projekt. Beträge netto; Steuern werden nicht simuliert.</p></div></div>
+    ${todo.length ? `<div class="card mt" style="margin-top:12px"><h3>Rechnungen zu stellen</h3>${todo.map(({ p, b }) => `<div class="row sm" style="padding:5px 0"><span class="sp">${esc(getCo(p.co).n)} – ${esc(b.label)}</span><b>${eur(b.amt)}</b><button class="btn s p" data-a="bill" data-p="${p.id}" data-b="${b.id}">Stellen</button></div>`).join('')}<p class="xs mut3">Ohne Rechnung kein Geld – Zahlungsziele laufen erst ab Rechnungsdatum.</p></div>` : ''}
+    <div class="card mt" style="margin-top:12px"><h3>Erwartete Fälligkeiten (nächste 60 Tage)</h3>${exp.map(i => `<div class="row sm" style="padding:3px 0"><span class="mono xs mut3">${fmtShort(i.due)}</span><span class="sp">${esc(getCo(i.co).n)} · ${i.no}</span><b>${eur(i.amt)}</b></div>`).join('') || '<p class="mut sm">Keine.</p>'}<p class="xs mut3">Kunden zahlen oft später als fällig – plane Puffer ein.</p></div>` : ''}
+    ${tab === 'inv' ? `<table class="tbl"><thead><tr><th>Nr.</th><th>Kunde</th><th>Beschreibung</th><th>Betrag</th><th>Fällig</th><th>Status</th><th></th></tr></thead><tbody>${inv.map(i => `<tr><td class="mono xs">${i.no}</td><td class="sm">${esc(getCo(i.co).n)}</td><td class="sm">${esc(i.label)}</td><td class="sm">${eur(i.amt)}</td><td class="sm">${fmtDate(i.due)}</td><td>${i.paid ? '<span class="tag ok">bezahlt</span>' : S.day > i.due ? '<span class="tag bad">überfällig</span>' : '<span class="tag">offen</span>'}</td><td class="r">${!i.paid && S.day > i.due ? `<button class="btn s" data-a="rem" data-id="${i.id}">Erinnern</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">Noch keine Rechnungen.</td></tr>'}</tbody></table>` : ''}
+    ${tab === 'led' ? `<table class="tbl"><thead><tr><th>Datum</th><th>Kategorie</th><th>Beschreibung</th><th class="r">Betrag</th></tr></thead><tbody>${S.led.slice().reverse().map(l => `<tr><td class="sm">${fmtDate(l.d)}</td><td class="sm">${esc(l.cat)}</td><td class="sm">${esc(l.m)}</td><td class="r sm ${l.t === 'rev' ? 'ok' : ''}">${l.t === 'rev' ? '+' : '−'}${eur(l.a)}</td></tr>`).join('') || '<tr><td colspan="4" class="empty">Keine Buchungen.</td></tr>'}</tbody></table>` : ''}
+    ${tab === 'cus' ? `<table class="tbl"><thead><tr><th>Kunde</th><th>Umsatz</th><th>Kosten</th><th>Ergebnis</th><th>Projekt-Std.</th><th>Effektiv €/h</th></tr></thead><tbody>${Object.entries(perCo).map(([id, v]) => { const h = sum(S.projects.filter(p => p.co === id), p => p.hrs); return `<tr><td class="sm">${esc(getCo(id).n)}</td><td class="sm">${eur(v.r)}</td><td class="sm">${eur(v.e)}</td><td class="sm ${v.r - v.e >= 0 ? 'ok' : 'bad'}">${eur(v.r - v.e)}</td><td class="sm">${h.toFixed(0)}</td><td class="sm">${h ? eur((v.r - v.e) / h) : '–'}</td></tr>`; }).join('') || '<tr><td colspan="6" class="empty">Noch keine Kundenumsätze.</td></tr>'}</tbody></table><p class="xs mut3 mt">Der effektive Stundenlohn zeigt, ob dein Festpreis die tatsächliche Arbeitszeit trägt.</p>` : ''}</div>`;
+  }
+  return { render, go() { } };
+} };
